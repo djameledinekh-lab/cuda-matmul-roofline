@@ -47,7 +47,13 @@ Full tables: [`results_tesla_c2.md`](results/results_tesla_c2.md) and [`results_
 
 ## What limits each kernel
 
-<!-- Write this yourself after reading the results: 3 to 5 sentences per kernel. -->
+**Naive.** The kernel runs at 0.3 to 0.4 TFLOPS, above the 0.08 TFLOPS the Roofline allows at 0.25 FLOP/byte. The model is too pessimistic here: it assumes every operand comes from DRAM, while the L1/L2 caches serve a large share of the reads. Its real arithmetic intensity is higher than the analytical one.
+
+**Tiled.** Performance plateaus at about 0.88 TFLOPS, roughly a third of the 2.6 TFLOPS the Roofline allows at 8 FLOP/byte. DRAM bandwidth is therefore not what limits this kernel.
+
+**Coarsened.** Going from 2 × 2 to 4 × 4 outputs per thread gives a 30 % speedup at N = 4096 (1.68 → 2.17 TFLOPS), while the arithmetic intensity stays at 16 FLOP/byte. The gain does not come from DRAM traffic: it comes from fewer shared-memory reads, since each value loaded into a register now feeds more multiply-adds.
+
+**cuBLAS.** Throughput drops after N = 1024, from 5.7 to 3.8 TFLOPS. A likely cause is the T4 lowering its clock under sustained load, as it is a 70 W card. This is a hypothesis: confirming it needs the clock speeds logged with `nvidia-smi` during the benchmark.
 
 ## Run it
 
