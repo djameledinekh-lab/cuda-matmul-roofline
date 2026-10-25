@@ -33,7 +33,17 @@ The arithmetic intensity (AI) on the x-axis is **analytical**: FLOPs divided by 
 
 ## Results
 
-<!-- Paste results/results_tesla_c2.md here after running the benchmark. -->
+Measured on a Colab Tesla T4, FP32, mean of 20 runs after 5 warm-up runs. `% of cuBLAS` compares run times at the same N.
+
+| Kernel | N = 1024 | N = 2048 | N = 4096 | % of cuBLAS (N = 4096) |
+|---|---|---|---|---|
+| naive | 0.30 TFLOPS | 0.42 TFLOPS | not run | — |
+| tiled (32 × 32) | 0.80 TFLOPS | 0.89 TFLOPS | 0.88 TFLOPS | 23 % |
+| coarsened, 2 × 2 outputs per thread | 1.80 TFLOPS | 1.73 TFLOPS | 1.68 TFLOPS | 45 % |
+| coarsened, 4 × 4 outputs per thread | 2.54 TFLOPS | 2.18 TFLOPS | 2.17 TFLOPS | 57 % |
+| cuBLAS (`torch.matmul`) | 5.71 TFLOPS | 3.87 TFLOPS | 3.81 TFLOPS | 100 % |
+
+Full tables: [`results_tesla_c2.md`](results/results_tesla_c2.md) and [`results_tesla_c4.md`](results/results_tesla_c4.md). Roofline with 4 × 4 coarsening: [`roofline_tesla_c4.png`](results/roofline_tesla_c4.png).
 
 ## What limits each kernel
 
